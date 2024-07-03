@@ -1,6 +1,26 @@
 import Joi from "joi"
+import { userUniqueFieldAlreadyExists } from "../repositories/user.repository.js";
 
-export const signUpRequest = (req, res, next) => {
+const fieldAlreadyUsed = async (req) => {
+  if (await userUniqueFieldAlreadyExists('email', req.body.email)) {
+    return 'Email existe déjà'
+  }
+
+  if (await userUniqueFieldAlreadyExists('username', req.body.username)) {
+    return 'Nom d\'utilisateur existe déjà'
+  }
+}
+
+export const signUpRequest = async (req, res, next) => {
+  let fieldsError = await fieldAlreadyUsed(req)
+
+  if (fieldsError) {
+    return res.status(400).send({
+      state: false,
+      message: fieldsError
+    })
+  }
+
   const regexPassword = /^[a-zA-Z0-9]{6,30}$/
   
   const schema = Joi.object({
@@ -31,6 +51,7 @@ export const signUpRequest = (req, res, next) => {
       .required()
       .messages({
         'string.base': 'Nom d\'utilisateur doit être une chaîne de caractères',
+        'string.empty': 'Nom d\'utilisateur ne peut pas être vide',
         'string.alphanum': 'Nom d\'utilisateur doit être alphanumérique',
         'string.min': 'Nom d\'utilisateur minimum 3 caractères',
         'string.max': 'Nom d\'utilisateur maximum 15 caractères',
