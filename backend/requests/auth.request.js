@@ -1,6 +1,8 @@
 import Joi from "joi"
 
 export const signUpRequest = (req, res, next) => {
+  const regexPassword = /^[a-zA-Z0-9]{6,30}$/
+  
   const schema = Joi.object({
     fullName: Joi.string()
       .min(3)
@@ -36,7 +38,7 @@ export const signUpRequest = (req, res, next) => {
       }),
     
     password: Joi.string()
-      .pattern(new RegExp('^[a-zA-Z0-9]{6,30}$'))
+      .pattern(regexPassword)
       .required()
       .messages({
         'string.base': 'Mot de passe doit être une chaîne de caractères',
