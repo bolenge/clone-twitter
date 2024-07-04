@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import User from '../models/user.model.js'
 import { generateTokenAndSetCookie } from '../lib/utils/generateToken.js'
+import { getUserByField } from '../repositories/user.repository.js'
 
 export const signUp = async (req, res) => {
   try {
@@ -35,16 +36,50 @@ export const signUp = async (req, res) => {
       coverImg: user.coverImg,
     })
   } catch (error) {
-    return res.status(500).send({
+    console.error('Error in signUp controller: ', error.message)
+
+    res.status(500).send({
       error: "Une erreur s'est produite lors de la création de votre compte"
     })
   }
 }
 
 export const signIn = async (req, res) => {
-  res.send({
-    data: "You hit the sign in endpoint"
-  })
+  try {
+    const { username, password } = req.body
+    const user = await getUserByField('username', username)
+
+    if (!user) {
+      return res.status(400).send({
+        error: "Nom d'utilisateur d'utilisateur incorrect"
+      })
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      return res.status(400).send({
+        error: "Mot de passe incorrect"
+      })
+    }
+
+    generateTokenAndSetCookie(user._id, res)
+
+    res.status(201).send({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      username: user.username,
+      followers: user.followers,
+      following: user.following,
+      profileImg: user.profileImg,
+      coverImg: user.coverImg,
+    })
+  } catch (error) {
+    console.error('Error in signIn controller: ', error.message)
+
+    res.status(500).send({
+      error: "Une erreur s'est produite lors de la connexion"
+    })
+  }
 }
 
 export const logout = async (req, res) => {

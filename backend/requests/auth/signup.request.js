@@ -1,5 +1,5 @@
 import Joi from "joi"
-import { userUniqueFieldAlreadyExists } from "../repositories/user.repository.js";
+import { userUniqueFieldAlreadyExists } from "../../repositories/user.repository.js";
 
 const fieldAlreadyUsed = async (req) => {
   if (await userUniqueFieldAlreadyExists('email', req.body.email)) {
@@ -11,7 +11,7 @@ const fieldAlreadyUsed = async (req) => {
   }
 }
 
-export const signUpRequest = async (req, res, next) => {
+export default async (req, res, next) => {
   let fieldsError = await fieldAlreadyUsed(req)
 
   if (fieldsError) {
