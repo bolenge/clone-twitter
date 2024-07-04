@@ -96,3 +96,17 @@ export const logout = async (req, res) => {
     })
   }
 }
+
+export const getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password')
+
+    res.status(200).send(user)
+  } catch (error) {
+    console.error('Error in getUser controller: ', error.message)
+
+    res.status(500).send({
+      error: "Une erreur s'est produite lors de la récupération de l'utilisateur"
+    })
+  }
+}
