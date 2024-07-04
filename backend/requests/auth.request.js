@@ -3,11 +3,11 @@ import { userUniqueFieldAlreadyExists } from "../repositories/user.repository.js
 
 const fieldAlreadyUsed = async (req) => {
   if (await userUniqueFieldAlreadyExists('email', req.body.email)) {
-    return 'Email existe déjà'
+    return 'Email déjà utilisé'
   }
 
   if (await userUniqueFieldAlreadyExists('username', req.body.username)) {
-    return 'Nom d\'utilisateur existe déjà'
+    return 'Nom d\'utilisateur déjà utilisé'
   }
 }
 
@@ -16,8 +16,7 @@ export const signUpRequest = async (req, res, next) => {
 
   if (fieldsError) {
     return res.status(400).send({
-      state: false,
-      message: fieldsError
+      error: fieldsError
     })
   }
 
@@ -73,8 +72,7 @@ export const signUpRequest = async (req, res, next) => {
 
   if (error) {
     return res.status(400).send({
-      state: false,
-      message: error.details[0].message
+      error: error.details[0].message
     })
   }
 
