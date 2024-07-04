@@ -83,7 +83,16 @@ export const signIn = async (req, res) => {
 }
 
 export const logout = async (req, res) => {
-  res.send({
-    data: "You hit the logout endpoint"
-  })
+  try {
+    res.cookie('jwt', '', { maxAge: 0 })
+    res.status(200).send({
+      message: "Déconnecté avec succès"
+    })
+  } catch (error) {
+    console.error('Error in logout controller: ', error.message);
+
+    res.status(500).send({
+      error: "Une erreur s'est produite lors de la déconnexion"
+    })
+  }
 }
